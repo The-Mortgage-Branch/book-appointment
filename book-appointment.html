@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book an appointment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16233B;
+    --navy-deep:#0E1826;
+    --brass:#B8905B;
+    --brass-light:#D9B98A;
+    --paper:#F4F5F3;
+    --ink:#1E232B;
+    --slate:#5B6472;
+    --line:#DADFE2;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+  }
+  .card{
+    width:100%;
+    max-width:560px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:0 1px 2px rgba(14,24,38,0.04), 0 12px 32px rgba(14,24,38,0.06);
+    overflow:hidden;
+  }
+  .card-top{
+    background:var(--navy);
+    background-image:linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+    padding:28px 32px 24px;
+    color:#fff;
+    position:relative;
+  }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--brass-light);
+    font-weight:600;
+    margin:0 0 8px;
+  }
+  h1{
+    font-family:'Newsreader', serif;
+    font-weight:500;
+    font-size:26px;
+    line-height:1.25;
+    margin:0;
+  }
+  .route-diagram{
+    position:absolute;
+    right:24px;
+    top:50%;
+    transform:translateY(-50%);
+    opacity:0.55;
+  }
+  .body{
+    padding:28px 32px 32px;
+  }
+  .step{display:none;}
+  .step.active{display:block;}
+  .question{
+    font-size:15px;
+    color:var(--slate);
+    margin:0 0 20px;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .opt{
+    text-align:left;
+    width:100%;
+    padding:16px 18px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .opt:hover{
+    border-color:var(--brass);
+    background:#FBF8F3;
+  }
+  .opt:active{ transform:scale(0.995); }
+  .opt .arrow{
+    color:var(--brass);
+    font-size:18px;
+    flex-shrink:0;
+  }
+  .opt .sub{
+    display:block;
+    font-weight:400;
+    font-size:12.5px;
+    color:var(--slate);
+    margin-top:2px;
+  }
+  .back{
+    background:none;
+    border:none;
+    color:var(--slate);
+    font-size:13px;
+    cursor:pointer;
+    padding:0;
+    margin-bottom:18px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+  .back:hover{ color:var(--ink); }
+  .confirm{
+    text-align:center;
+    padding:8px 0 4px;
+  }
+  .advisor-badge{
+    width:64px;height:64px;
+    border-radius:50%;
+    background:var(--navy);
+    color:#fff;
+    font-family:'Newsreader', serif;
+    font-size:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 16px;
+  }
+  .confirm h2{
+    font-family:'Newsreader', serif;
+    font-weight:500;
+    font-size:21px;
+    margin:0 0 6px;
+  }
+  .confirm p{
+    color:var(--slate);
+    font-size:14px;
+    margin:0 0 22px;
+  }
+  .cta{
+    display:inline-block;
+    background:var(--navy);
+    color:#fff;
+    text-decoration:none;
+    font-weight:600;
+    font-size:14.5px;
+    padding:13px 28px;
+    border-radius:8px;
+    transition:background .15s ease;
+  }
+  .cta:hover{ background:var(--navy-deep); }
+  .redirect-note{
+    margin-top:14px;
+    font-size:12.5px;
+    color:var(--slate);
+  }
+  .footer{
+    text-align:center;
+    font-size:12px;
+    color:var(--slate);
+    margin-top:18px;
+  }
+
+  /* --- Booking step --- */
+  #step-booking{ padding-top:2px; }
+  .booking-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .booking-title{
+    font-size:14px;
+    color:var(--slate);
+  }
+  .booking-title strong{ color:var(--ink); }
+  .tabs{
+    display:flex;
+    gap:6px;
+    background:#F0F1EF;
+    padding:4px;
+    border-radius:9px;
+    margin-bottom:16px;
+  }
+  .tab{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:9px 10px;
+    border-radius:6px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13.5px;
+    font-weight:500;
+    color:var(--slate);
+    cursor:pointer;
+  }
+  .tab.active{
+    background:#fff;
+    color:var(--navy);
+    box-shadow:0 1px 2px rgba(14,24,38,0.08);
+  }
+  .calendly-inline-widget{
+    min-width:280px;
+    height:640px;
+    border-radius:10px;
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .cal-pane{ display:none; }
+  .cal-pane.active{ display:block; }
+  .loading-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:120px;
+    color:var(--slate);
+    font-size:13px;
+  }
+</style>
+</head>
+<body>
+
+<div style="width:100%; max-width:560px;">
+  <div class="card">
+    <div class="card-top">
+      <p class="eyebrow">Book a call</p>
+      <h1>Let's get you to<br>the right adviser</h1>
+      <svg class="route-diagram" width="70" height="60" viewBox="0 0 70 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="6" cy="30" r="4" fill="#D9B98A"/>
+        <path d="M10 30 H30" stroke="#D9B98A" stroke-width="1.2" stroke-dasharray="2 3"/>
+        <path d="M30 30 L54 10" stroke="#D9B98A" stroke-width="1.2" stroke-dasharray="2 3"/>
+        <path d="M30 30 L54 30" stroke="#D9B98A" stroke-width="1.2" stroke-dasharray="2 3"/>
+        <path d="M30 30 L54 50" stroke="#D9B98A" stroke-width="1.2" stroke-dasharray="2 3"/>
+        <circle cx="58" cy="10" r="3.2" fill="#D9B98A" opacity="0.9"/>
+        <circle cx="58" cy="30" r="3.2" fill="#D9B98A" opacity="0.9"/>
+        <circle cx="58" cy="50" r="3.2" fill="#D9B98A" opacity="0.9"/>
+      </svg>
+    </div>
+
+    <div class="body">
+
+      <!-- Step 1: question -->
+      <div class="step active" id="step-question">
+        <p class="question">What kind of mortgage are you looking for? This shows you the calendar(s) of the adviser(s) who cover it, so you can book straight in.</p>
+        <div class="options">
+          <button class="opt" onclick="route('residential')">
+            <span>
+              Residential mortgage
+              <span class="sub">Buying or remortgaging your own home</span>
+            </span>
+            <span class="arrow">→</span>
+          </button>
+          <button class="opt" onclick="route('btl-personal')">
+            <span>
+              Buy-to-let mortgage
+              <span class="sub">In your personal name</span>
+            </span>
+            <span class="arrow">→</span>
+          </button>
+          <button class="opt" onclick="route('btl-ltd')">
+            <span>
+              Buy-to-let mortgage
+              <span class="sub">Through a limited company</span>
+            </span>
+            <span class="arrow">→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: live booking calendars -->
+      <div class="step" id="step-booking">
+        <button class="back" onclick="goBack()">← Back</button>
+
+        <!-- Single adviser (Ricky) -->
+        <div id="single-adviser" style="display:none;">
+          <p class="booking-title">Booking with <strong>Ricky</strong> — limited company buy-to-let specialist</p>
+          <div id="cal-ricky" class="calendly-inline-widget" data-url=""></div>
+        </div>
+
+        <!-- Two advisers to compare -->
+        <div id="dual-adviser" style="display:none;">
+          <div class="booking-head">
+            <p class="booking-title">Pick whichever date suits you best</p>
+          </div>
+          <div class="tabs">
+            <button class="tab active" id="tab-samlucy" onclick="showPane('samlucy')">Sam &amp; Lucy</button>
+            <button class="tab" id="tab-dom" onclick="showPane('dom')">Dom</button>
+          </div>
+          <div class="cal-pane active" id="pane-samlucy">
+            <div id="cal-samlucy" class="calendly-inline-widget" data-url=""></div>
+          </div>
+          <div class="cal-pane" id="pane-dom">
+            <div id="cal-dom" class="calendly-inline-widget" data-url=""></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <p class="footer">Your details stay with us — this just points you to the right calendar.</p>
+</div>
+
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+<script>
+  // ---- Calendly links ----
+  // Add ?hide_gdpr_banner=1 and &embed_domain / &embed_type are handled by the widget script automatically.
+  const LINKS = {
+    sam_lucy: "https://calendly.com/sam-lucy-kgc",
+    dom: "https://calendly.com/dommortgagebranch/30min",
+    ricky: "https://calendly.com/ricky-btl-mortgagebranch/30min"
+  };
+
+  let widgetsBuilt = { ricky:false, samlucy:false, dom:false };
+
+  function buildWidget(elId, url, key) {
+    if (widgetsBuilt[key]) return;
+    const el = document.getElementById(elId);
+    el.setAttribute('data-url', url);
+    // If Calendly's script has already loaded, initialize immediately;
+    // otherwise it auto-initializes any .calendly-inline-widget on load.
+    if (window.Calendly) {
+      window.Calendly.initInlineWidget({ url: url, parentElement: el });
+    }
+    widgetsBuilt[key] = true;
+  }
+
+  function route(kind) {
+    document.getElementById('step-question').classList.remove('active');
+    document.getElementById('step-booking').classList.add('active');
+
+    if (kind === 'btl-ltd') {
+      document.getElementById('single-adviser').style.display = 'block';
+      document.getElementById('dual-adviser').style.display = 'none';
+      buildWidget('cal-ricky', LINKS.ricky, 'ricky');
+    } else {
+      document.getElementById('single-adviser').style.display = 'none';
+      document.getElementById('dual-adviser').style.display = 'block';
+      buildWidget('cal-samlucy', LINKS.sam_lucy, 'samlucy');
+      buildWidget('cal-dom', LINKS.dom, 'dom');
+    }
+  }
+
+  function showPane(which) {
+    document.getElementById('tab-samlucy').classList.toggle('active', which === 'samlucy');
+    document.getElementById('tab-dom').classList.toggle('active', which === 'dom');
+    document.getElementById('pane-samlucy').classList.toggle('active', which === 'samlucy');
+    document.getElementById('pane-dom').classList.toggle('active', which === 'dom');
+  }
+
+  function goBack() {
+    document.getElementById('step-booking').classList.remove('active');
+    document.getElementById('step-question').classList.add('active');
+  }
+</script>
+
+</body>
+</html>
